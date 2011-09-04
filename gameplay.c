@@ -180,9 +180,6 @@ int start_new_game(void)
 
     draw_level_info(game_options.initial_level);
 
-    // FIXME: although the pthreads are cancellable by default, 
-    //        it is better if we set that explicitly...
-
     /* create the worker thread */
     if (pthread_create(&data.thread_id, NULL, worker_thread_fn, (void *)&data))
         return FAILURE;
@@ -400,7 +397,6 @@ static void *worker_thread_fn(void *arg)
                 /* freeze this block in the game board */
                 freeze_block(data->current);
                 data->current = NULL;	/* reset the current block pointer */
-                // FIXME: draw_game_board(current);
 
                 num_rows = clear_even_rows();
                 if (num_rows) {
@@ -408,8 +404,10 @@ static void *worker_thread_fn(void *arg)
                     draw_score_board(&game_score);
 
                     /* see if the level has changed */
-                    if (ret)
+                    if (ret) {
+                        draw_game_board(data->current);
                         draw_level_info(game_score.level);
+                    }
                 }
             }
         }
@@ -444,8 +442,6 @@ static int update_score_level(struct game_score *score, int num_rows,
         if (game_options.increase_difficulty &&
                 score->level < DIFFICULTY_LEVEL_MAX)
             *timeout -= TIMEOUT_DELTA(score->level);
-            // FIXME: this formula is bad!!!
-            //*timeout = INITIAL_TIMEOUT - ((score->level - 1) * TIMEOUT_DELTA);
 
         if (game_options.clear_on_new_level)
             reset_game_board();

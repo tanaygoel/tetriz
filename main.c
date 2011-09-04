@@ -1,7 +1,7 @@
 #include "tetriz.h"
 
-#include <signal.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 
 const char *prog_name = NULL;
@@ -43,26 +43,19 @@ int main(int argc, char **argv)
     return 0;
 }
 
-static void handle_SIGSEGV(int signal)
-{
-    deinitialize_graphics();
-    raise(signal);
-}
-
 static int do_initialization(int argc, char **argv)
 {
-    int ret = argc;
-
-    /* set SIGSEGV handler */
-    /* TODO: implement it using sigaction */
-    if (signal(SIGSEGV, handle_SIGSEGV) == SIG_ERR) {
-        fprintf(stderr, "%s: failed to install signal handler\n", prog_name);
-        return 1;
-    }
+    int ret = argc; /* FIXME: assignment is to avoid warning for unused argc */
 
     /* get the name the program was invoked with */
     prog_name = strrchr(*argv, '/');
     prog_name = prog_name ? (prog_name + 1) : *argv;
+
+    /* install exit-handler */
+    if (atexit(deinitialize_graphics)) {
+        fprintf(stderr, "%s: failed to install exit-handlers\n", prog_name);
+        return FAILURE;
+    }
 
     // parse_command_line_arguments(argc, argv);
 
