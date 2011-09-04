@@ -1,0 +1,37 @@
+A text-mode game based on the classic game Tetris...
+
+
+Tetriz is a simple game written in C, using Ncurses for the terminal graphics.
+It's a clone of the classic game Tetris (http://en.wikipedia.org/wiki/Tetris)...
+
+
+LICENSE:
+--------
+GPLv3 (and above)
+
+
+SUPPORTED PLATFORMS:
+--------------------
+Linux, and other POSIX systems. Tetriz requires only pthreads and ncurses, so 
+any POSIX based system should be able to build/run it. It should be possible to 
+run it under Windows using existing Unix-like environments like Cygwin. I 
+haven't tried to build/run it on systems other than Linux, and any kind of
+contributions are more than welcome :)
+
+
+USAGE:
+------
+To build Tetriz, run 'make' inside the directory where you have the source.
+
+    $ make
+
+NOTE: you need to have gcc installed, along with development packages for 
+      pthreads and ncurses. Refer your distribution documentation for how to 
+      obtain these packages.
+
+To play the game, run the executable 'tetriz'.
+
+    $ ./tetriz
+
+Enjoy!
+
