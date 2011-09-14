@@ -76,3 +76,4 @@ static int do_initialization(int argc, char **argv)
     return ret;
 }
 
+/* vim: set ai ts=4 sw=4 tw=80 expandtab: */

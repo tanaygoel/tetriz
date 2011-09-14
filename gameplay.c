@@ -495,8 +495,8 @@ static int clear_even_rows(void)
     int i = GAME_BOARD_HEIGHT;
     int cleared_rows[4];        /* XXX: max 4 rows can be cleared at a time? */
 
-	/* use animation style 3 */
-	static void (*clear_animation)(int *, int) = draw_cleared_rows_animation_3;
+    /* use animation style 3 */
+    static void (*clear_animation)(int *, int) = draw_cleared_rows_animation_3;
 
     for (abs_row = GAME_BOARD_HEIGHT; i > top_row; abs_row--) {
         int j;
@@ -532,3 +532,4 @@ static int clear_even_rows(void)
     return count;
 }
 
+/* vim: set ai ts=4 sw=4 tw=80 expandtab: */

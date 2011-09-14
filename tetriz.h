@@ -114,3 +114,4 @@ void draw_cleared_rows_animation_3(int *cleared_rows, int count);
 
 #endif	/* __TETRIZ_H__ */
 
+/* vim: set ai ts=4 sw=4 tw=80 expandtab: */

@@ -122,18 +122,15 @@ int display_main_menu(void)
 
 
 /* check if the current window size is big enough */
-int evaluate_screensize(void)
+static int evaluate_screensize(int x, int y)
 {
     int status = SUCCESS;
-    int current_x, current_y;
 
-    getmaxyx(stdscr, current_y, current_x);
-    if (current_x < WINDOW_MAIN_SIZE_X || current_y < WINDOW_MAIN_SIZE_Y) {
+    if (x < WINDOW_MAIN_SIZE_X || y < WINDOW_MAIN_SIZE_Y) {
         endwin();
         fprintf(stderr, "error: your terminal size [%2d x %2d] is not "
                 "sufficient to play the game. The minimum required size is "
-                "[%2d x %2d]\n", current_x, current_y, WINDOW_MAIN_SIZE_X,
-                WINDOW_MAIN_SIZE_Y);
+                "[%2d x %2d]\n", x, y, WINDOW_MAIN_SIZE_X, WINDOW_MAIN_SIZE_Y);
         status = FAILURE;
     }
 
@@ -142,25 +139,33 @@ int evaluate_screensize(void)
 
 int initialize_graphics(void)
 {
+    int current_x, current_y;
+    int start_x, start_y;
+
     initscr();
+    getmaxyx(stdscr, current_y, current_x);
 
     /* check if the current window size is big enough */
-    if (evaluate_screensize() == FAILURE)
+    if (evaluate_screensize(current_x, current_y) == FAILURE)
         return FAILURE;
 
     cbreak();
     noecho();
     curs_set(0);
 
+    start_x = ((current_x - WINDOW_MAIN_SIZE_X) / 2);
+    start_y = ((current_y - WINDOW_MAIN_SIZE_Y) / 2);
+
     // FIXME: in case the screen size is larger than the required size, 
     // the game should be placed at the center of the window...
-    win_main    = newwin(WINDOW_MAIN_SIZE_Y, WINDOW_MAIN_SIZE_X, 0, 0);
-    win_game    = newwin(20, 24, 2, 14);
-    win_quit    = newwin(7, 24, 7, 14);
-    win_next    = newwin(4, 8, 5, 48);
-    win_score   = newwin(7, 8, 14, 63);
-    win_menu    = newwin(13, 35, 10, 22);
-    win_options = newwin(13, 50, 6, 15);
+    win_main    = newwin(WINDOW_MAIN_SIZE_Y, WINDOW_MAIN_SIZE_X, 
+                    start_y, start_x);
+    win_game    = newwin(20, 24, start_y + 2, start_x + 14);
+    win_quit    = newwin(7, 24, start_y + 7, start_x + 14);
+    win_next    = newwin(4, 8, start_y + 5, start_x + 48);
+    win_score   = newwin(7, 8, start_y + 14, start_x + 63);
+    win_menu    = newwin(13, 35, start_y + 10, start_x + 22);
+    win_options = newwin(13, 50, start_y + 6, start_x + 15);
 
     if (!win_main || !win_game || !win_quit || !win_next || 
             !win_score || !win_menu || !win_options) {
@@ -540,7 +545,7 @@ input_t fetch_user_input(void)
         case KEY_DOWN:  case 'S':   case 's':
             result = INPUT_MOVE_DOWN;
             break;
-		case ' ':								/* space bar */
+        case ' ':                               /* space bar */
             result = INPUT_MOVE_UP_DROP;
             break;
         case 'J':   case 'j':   case 'Z':   case 'z':
@@ -853,25 +858,26 @@ void draw_cleared_rows_animation_3(int *rows, int count)
     int i, j;
 
     napms(300);
-	if (++direction & 1) {
-		for (i = 0; i <= width / 2; i++) {
-			for (j = 0; j < count; j++) {
-				mvwaddch(win_game, rows[j], i, ' ' | A_NORMAL);
-				mvwaddch(win_game, rows[j], (width - i - 1), ' ' | A_NORMAL);
-			}
-			wrefresh(win_game);
-			napms(30);
-		}
-	} else {
-		for (i = width / 2; i >= 0; i--) {
-			for (j = 0; j < count; j++) {
-				mvwaddch(win_game, rows[j], i, ' ' | A_NORMAL);
-				mvwaddch(win_game, rows[j], (width - i - 1), ' ' | A_NORMAL);
-			}
-			wrefresh(win_game);
-			napms(30);
-		}
-	}
+    if (++direction & 1) {
+        for (i = 0; i <= width / 2; i++) {
+            for (j = 0; j < count; j++) {
+                mvwaddch(win_game, rows[j], i, ' ' | A_NORMAL);
+                mvwaddch(win_game, rows[j], (width - i - 1), ' ' | A_NORMAL);
+            }
+            wrefresh(win_game);
+            napms(30);
+        }
+    } else {
+        for (i = width / 2; i >= 0; i--) {
+            for (j = 0; j < count; j++) {
+                mvwaddch(win_game, rows[j], i, ' ' | A_NORMAL);
+                mvwaddch(win_game, rows[j], (width - i - 1), ' ' | A_NORMAL);
+            }
+            wrefresh(win_game);
+            napms(30);
+        }
+    }
 #undef board_width
 }
 
+/* vim: set ai ts=4 sw=4 tw=80 expandtab: */
