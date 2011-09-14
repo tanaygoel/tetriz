@@ -225,9 +225,9 @@ void display_instructions(void)
         "A (or Left Arrow)      :      Move Left",
         "D (or Right Arrow)     :      Move Right",
         "S (or Down Arrow)      :      Move Down",
-        "W (or Up Arrow)        :      Drop the block down",
         "J (or Z)               :      Rotate counter-clockwise",
         "K (or X)               :      Rotate clockwise",
+        "Space Bar              :      Drop the block down",
         "Q (or P or Esc)        :      To Pause/Quit the game",
     };
 
@@ -540,7 +540,7 @@ input_t fetch_user_input(void)
         case KEY_DOWN:  case 'S':   case 's':
             result = INPUT_MOVE_DOWN;
             break;
-        case KEY_UP:    case 'W':   case 'w':
+		case ' ':								/* space bar */
             result = INPUT_MOVE_UP_DROP;
             break;
         case 'J':   case 'j':   case 'Z':   case 'z':
@@ -786,8 +786,7 @@ void draw_level_info(int level)
     wtimeout(win_game, GAME_INPUT_TIMEOUT);
 }
 
-#if 0
-void draw_cleared_rows_animation(int *rows, int count)
+void draw_cleared_rows_animation_1(int *rows, int count)
 {
     int j;
     static const char *empty_row = "                        ";
@@ -825,8 +824,8 @@ void draw_cleared_rows_animation(int *rows, int count)
     wrefresh(win_game);
     napms(500);
 }
-#else
-void draw_cleared_rows_animation(int *rows, int count)
+
+void draw_cleared_rows_animation_2(int *rows, int count)
 {
 #define board_width (GAME_BOARD_WIDTH << 1)
     static int direction = 0;     /* animation from left or right */
@@ -845,20 +844,34 @@ void draw_cleared_rows_animation(int *rows, int count)
     }
 #undef board_width
 }
-#endif
 
-#if 0
-static void fill_window(WINDOW *win)
+void draw_cleared_rows_animation_3(int *rows, int count)
 {
-    int i, j, x, y;
-    getmaxyx(win, y, x);
+#define width (GAME_BOARD_WIDTH << 1)
+    static int direction = 0;     /* animation from center or ends */
 
-    werase(win);
-    for (i = 0; i < x; i++) {
-        move(i, 0);
-        for (j = 0; j < y; j++)
-            waddch(win, ACS_CKBOARD);
-    }
+    int i, j;
+
+    napms(300);
+	if (++direction & 1) {
+		for (i = 0; i <= width / 2; i++) {
+			for (j = 0; j < count; j++) {
+				mvwaddch(win_game, rows[j], i, ' ' | A_NORMAL);
+				mvwaddch(win_game, rows[j], (width - i - 1), ' ' | A_NORMAL);
+			}
+			wrefresh(win_game);
+			napms(30);
+		}
+	} else {
+		for (i = width / 2; i >= 0; i--) {
+			for (j = 0; j < count; j++) {
+				mvwaddch(win_game, rows[j], i, ' ' | A_NORMAL);
+				mvwaddch(win_game, rows[j], (width - i - 1), ' ' | A_NORMAL);
+			}
+			wrefresh(win_game);
+			napms(30);
+		}
+	}
+#undef board_width
 }
-#endif
 

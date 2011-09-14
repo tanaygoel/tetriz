@@ -108,7 +108,9 @@ void draw_score_board(struct game_score *score);
 void draw_level_info(int level);
 void draw_game_paused(void);
 void draw_highscore(int score);
-void draw_cleared_rows_animation(int *cleared_rows, int count);
+void draw_cleared_rows_animation_1(int *cleared_rows, int count);
+void draw_cleared_rows_animation_2(int *cleared_rows, int count);
+void draw_cleared_rows_animation_3(int *cleared_rows, int count);
 
 #endif	/* __TETRIZ_H__ */
 
