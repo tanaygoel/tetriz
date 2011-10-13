@@ -31,6 +31,14 @@ struct thread_data {
     int new_highscore;
     pthread_mutex_t lock;
     pthread_t thread_id;
+    int block_dropped_ignore_input;
+    /* 
+     * XXX: the reason behind the block_dropped_ignore_input is as follows:
+     *      when a block is dropped, we want to make sure that it can not be 
+     *      moved by the user (this can happen if the user hits some key, and 
+     *      the main thread catches it before the other thread can freeze the 
+     *      block). The solution, this flag, is an ugly hack to achive the same.
+     */
 };
 
 static int move_block(struct block *block, action_t movement);
@@ -168,7 +176,7 @@ static int time_pass(void)
 
 int start_new_game(void)
 {
-    struct thread_data data = { NULL, 0, 0, PTHREAD_MUTEX_INITIALIZER, 0 };
+    struct thread_data data = { NULL, 0, 0, PTHREAD_MUTEX_INITIALIZER, 0, 0 };
 
     initialize_game_elements();
     initialize_game_screen();
@@ -216,7 +224,8 @@ static void play_game(struct thread_data *data)
         }
 
         /* in case there's no "current block", don't do anything */
-        if (!data->current && input != INPUT_PAUSE_QUIT) {
+        if (data->block_dropped_ignore_input || 
+                (!data->current && input != INPUT_PAUSE_QUIT)) {
             pthread_mutex_unlock(&data->lock);
             continue;
         }
@@ -240,8 +249,10 @@ static void play_game(struct thread_data *data)
                 break;
             case INPUT_MOVE_UP_DROP:
                 status = move_block(data->current, ACTION_MOVE_UP_DROP);
-                if (status == SUCCESS)
+                if (status == SUCCESS) {
+                    data->block_dropped_ignore_input = 1;
                     draw_game_board(data->current);
+                }
                 break;
             case INPUT_ROTATE_LEFT:
                 status = move_block(data->current, ACTION_ROTATE_LEFT);
@@ -397,6 +408,7 @@ static void *worker_thread_fn(void *arg)
                 /* freeze this block in the game board */
                 freeze_block(data->current);
                 data->current = NULL;	/* reset the current block pointer */
+                data->block_dropped_ignore_input = 0; /* reset this now */
 
                 num_rows = clear_even_rows();
                 if (num_rows) {
