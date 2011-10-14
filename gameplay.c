@@ -161,19 +161,6 @@ static inline struct block *update_current_block(struct block *block)
     return block;
 }
 
-#if 0
-static int time_pass(void)
-{
-    while (1) {
-        draw_next_block(next_block, next_block_orientation);
-        draw_game_board(&current_block);
-        update_current_block(&current_block);
-    }
-
-    return 0;
-}
-#endif
-
 int start_new_game(void)
 {
     struct thread_data data = { NULL, 0, 0, PTHREAD_MUTEX_INITIALIZER, 0, 0 };
