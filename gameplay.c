@@ -211,8 +211,8 @@ static void play_game(struct thread_data *data)
         }
 
         /* in case there's no "current block", don't do anything */
-        if (data->block_dropped_ignore_input || 
-                (!data->current && input != INPUT_PAUSE_QUIT)) {
+        if (input != INPUT_PAUSE_QUIT && 
+                (data->block_dropped_ignore_input || !data->current)) {
             pthread_mutex_unlock(&data->lock);
             continue;
         }
