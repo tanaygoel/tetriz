@@ -5,7 +5,7 @@ LDFLAGS=-pthread -lncurses
 OBJS=main.o graphics.o gameplay.o
 
 tetriz: $(OBJS)
-	$(CC) $(LDFLAGS) -o tetriz $(OBJS)
+	$(CC) -o tetriz $(OBJS) $(LDFLAGS)
 
 main.o: main.c tetriz.h
 	$(CC) $(CFLAGS) -c main.c
@@ -17,5 +17,5 @@ graphics.o: graphics.c tetriz.h
 	$(CC) $(CFLAGS) -c graphics.c
 
 clean:
-	rm *.o tetriz
+	rm -f *.o tetriz
 
